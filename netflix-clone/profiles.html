@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StreamFlix – Who's Watching?</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body style="overflow: hidden;">
+
+<div class="profiles-wrapper">
+  <!-- Header Logo -->
+  <header class="profiles-header">
+    <div class="logo">
+      <span class="logo-stream">STREAM</span><span class="logo-flix">FLIX</span>
+    </div>
+  </header>
+
+  <!-- Profiles Selector Content -->
+  <div class="profiles-content">
+    <h1 class="profiles-title" id="pageTitle">Who's watching?</h1>
+    
+    <div class="profiles-grid" id="profilesGrid">
+      <!-- Card 1: Alex -->
+      <div class="profile-card" data-name="Alex Flix" data-email="alex@streamflix.io" data-avatar="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1">
+        <div class="profile-avatar-box">
+          <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1" alt="Alex Flix" class="profile-avatar-img"/>
+        </div>
+        <div class="profile-name">Alex Flix</div>
+      </div>
+
+      <!-- Card 2: Sarah -->
+      <div class="profile-card" data-name="Sarah Flix" data-email="sarah@streamflix.io" data-avatar="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Sarah">
+        <div class="profile-avatar-box">
+          <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Sarah" alt="Sarah Flix" class="profile-avatar-img"/>
+        </div>
+        <div class="profile-name">Sarah</div>
+      </div>
+
+      <!-- Card 3: Kids -->
+      <div class="profile-card" data-name="Kids Room" data-email="kids@streamflix.io" data-avatar="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Kids">
+        <div class="profile-avatar-box">
+          <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Kids" alt="Kids" class="profile-avatar-img"/>
+        </div>
+        <div class="profile-name">Kids</div>
+      </div>
+
+      <!-- Card 4: Guest -->
+      <div class="profile-card" data-name="Guest Streamer" data-email="guest@streamflix.io" data-avatar="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Guest">
+        <div class="profile-avatar-box">
+          <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Guest" alt="Guest" class="profile-avatar-img"/>
+        </div>
+        <div class="profile-name">Guest</div>
+      </div>
+    </div>
+
+    <!-- Manage Profiles Trigger -->
+    <button class="manage-profiles-btn" id="manageBtn" onclick="manageProfiles()">Manage Profiles</button>
+  </div>
+</div>
+
+<!-- Glowing viewport frame -->
+<div class="app-viewport-frame"></div>
+
+<!-- Black screen transition overlay -->
+<div class="screen-transition-overlay" id="transitionOverlay"></div>
+
+<script>
+  // Simple toast function
+  function showProfilesToast(msg) {
+    let t = document.querySelector('.toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.className = 'toast';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Manage Profiles decorative link
+  function manageProfiles() {
+    showProfilesToast("🔧 Profile editing features are coming soon!");
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.profile-card');
+    const overlay = document.getElementById('transitionOverlay');
+    const title = document.getElementById('pageTitle');
+    const manageBtn = document.getElementById('manageBtn');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        // 1. Mark selected card
+        card.classList.add('selected-profile');
+
+        // 2. Fade out title and other profiles
+        title.style.opacity = '0';
+        title.style.transform = 'translateY(-10px)';
+        title.style.transition = 'all 0.5s ease';
+
+        if (manageBtn) {
+          manageBtn.style.opacity = '0';
+          manageBtn.style.transition = 'all 0.4s ease';
+        }
+
+        cards.forEach(c => {
+          if (c !== card) {
+            c.classList.add('fade-out-profile');
+          }
+        });
+
+        // 3. Save selection to localStorage
+        const name = card.getAttribute('data-name');
+        const email = card.getAttribute('data-email');
+        const avatar = card.getAttribute('data-avatar');
+
+        localStorage.setItem('sf_current_profile', JSON.stringify({ name, email, avatar }));
+
+        // Dynamically toggle body theme class for border transition glow change
+        document.body.classList.remove('theme-alex', 'theme-sarah', 'theme-kids', 'theme-guest');
+        if (name === 'Alex Flix') document.body.classList.add('theme-alex');
+        else if (name === 'Sarah Flix') document.body.classList.add('theme-sarah');
+        else if (name === 'Kids Room') document.body.classList.add('theme-kids');
+        else if (name === 'Guest Streamer') document.body.classList.add('theme-guest');
+
+        // 4. Fade entire screen to black and redirect
+        setTimeout(() => {
+          overlay.classList.add('active');
+        }, 300);
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1100);
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TV Shows – StreamFlix</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-left">
+    <a href="index.html" class="logo">
+      <span class="logo-stream">STREAM</span><span class="logo-flix">FLIX</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="movies.html">Movies</a></li>
+      <li><a href="tvshows.html" class="active">TV Shows</a></li>
+      <li><a href="#">New &amp; Popular</a></li>
+      <li><a href="#">My List</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <div class="search-box" id="searchBox">
+      <i class="fas fa-search" id="searchIcon"></i>
+      <input type="text" id="searchInput" placeholder="Titles, people, genres…"/>
+    </div>
+    <i class="fas fa-bell nav-icon"></i>
+    <div class="profile-menu">
+      <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1" class="avatar" alt="Profile"/>
+      <div class="profile-dropdown">
+        <div class="profile-item"><i class="fas fa-user"></i> Profile</div>
+        <div class="profile-item"><i class="fas fa-gear"></i> Settings</div>
+        <hr/>
+        <div class="profile-item signout"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
+      </div>
+    </div>
+    <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>TV Shows</h1>
+  <div class="filter-bar">
+    <select id="genreFilter" onchange="filterShows()">
+      <option value="all">All Genres</option>
+      <option value="Drama">Drama</option>
+      <option value="Crime">Crime</option>
+      <option value="Sci-Fi">Sci-Fi</option>
+      <option value="Comedy">Comedy</option>
+      <option value="Fantasy">Fantasy</option>
+    </select>
+  </div>
+</div>
+
+<main class="grid-page">
+  <div class="content-grid" id="contentGrid"></div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-hero">
+      <img src="" alt="" id="modalHeroImg" class="modal-hero-img"/>
+      <div class="modal-hero-overlay"></div>
+      <div class="modal-hero-actions">
+        <button class="btn-play"><i class="fas fa-play"></i> Play</button>
+        <button class="btn-circle" id="modalListBtn" onclick="toggleList(this)"><i class="fas fa-plus"></i></button>
+        <button class="btn-circle"><i class="fas fa-thumbs-up"></i></button>
+        <button class="btn-circle"><i class="fas fa-thumbs-down"></i></button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="modal-meta" id="modalMeta"></div>
+        <p class="modal-desc" id="modalDesc"></p>
+      </div>
+      <div class="modal-right">
+        <p id="modalCast"></p>
+        <p id="modalGenres"></p>
+      </div>
+    </div>
+    <div class="modal-episodes" id="modalEpisodes"></div>
+  </div>
+</div>
+
+<div class="search-results" id="searchResults"></div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-social">
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+    <p class="footer-copy">© 2025 StreamFlix. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const shows = CONTENT.filter(c => c.type === 'series');
+    renderGrid(shows, 'contentGrid');
+  });
+  function filterShows() {
+    const genre = document.getElementById('genreFilter').value;
+    let filtered = CONTENT.filter(c => c.type === 'series');
+    if (genre !== 'all') filtered = filtered.filter(c => c.genres.includes(genre));
+    renderGrid(filtered, 'contentGrid');
+  }
+</script>
+</body>
+</html>

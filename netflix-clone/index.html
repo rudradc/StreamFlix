@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StreamFlix – Watch Anywhere</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-left">
+    <a href="index.html" class="logo">
+      <span class="logo-stream">STREAM</span><span class="logo-flix">FLIX</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="movies.html">Movies</a></li>
+      <li><a href="tvshows.html">TV Shows</a></li>
+      <li><a href="#">New &amp; Popular</a></li>
+      <li><a href="#">My List</a></li>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <div class="search-box" id="searchBox">
+      <i class="fas fa-search" id="searchIcon"></i>
+      <input type="text" id="searchInput" placeholder="Titles, people, genres…"/>
+    </div>
+    <i class="fas fa-bell nav-icon"></i>
+    <div class="profile-menu">
+      <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1" class="avatar" alt="Profile"/>
+      <div class="profile-dropdown">
+        <div class="profile-dd-header">
+          <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1" class="dd-avatar" alt="Avatar"/>
+          <div>
+            <div class="dd-name">Alex Flix</div>
+            <div class="dd-email">alex@streamflix.io</div>
+          </div>
+        </div>
+        <hr class="dd-divider"/>
+        <div class="profile-item" id="dropProfile"><i class="fas fa-user-circle"></i> My Profile</div>
+        <div class="profile-item" id="dropSettings"><i class="fas fa-gear"></i> Settings</div>
+        <div class="profile-item" id="dropHelp"><i class="fas fa-question-circle"></i> Help Center</div>
+        <hr class="dd-divider"/>
+        <div class="profile-item signout" id="dropSignout"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
+      </div>
+    </div>
+    <div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="heroCarouselContainer">
+  <!-- Carousel Slides (dynamic) -->
+  <div class="hero-slides" id="heroSlides">
+    <!-- Static Fallback Slide for SEO and initial load -->
+    <div class="hero-slide active" data-id="tt4574334">
+      <div class="hero-bg">
+        <img src="https://image.tmdb.org/t/p/original/56v2K5Ql84XJueq8fsyHkL2Y82F.jpg" alt="Stranger Things" class="hero-img"/>
+        <div class="hero-overlay"></div>
+      </div>
+      <div class="hero-content">
+        <div class="hero-badge"><i class="fas fa-fire"></i> #1 Trending Today</div>
+        <h1 class="hero-title">Stranger Things</h1>
+        <div class="hero-meta">
+          <span class="match">98% Match</span>
+          <span class="hero-rating"><i class="fas fa-star" style="color: var(--gold); margin-right: 4px;"></i>8.7</span>
+          <span>2022</span>
+          <span class="rating-badge">TV-14</span>
+          <span>4 Seasons</span>
+        </div>
+        <p class="hero-desc">
+          When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.
+        </p>
+        <div class="hero-buttons">
+          <button class="btn-play" onclick="openModal('tt4574334')">
+            <i class="fas fa-play"></i> Play
+          </button>
+          <button class="btn-info" onclick="openModal('tt4574334')">
+            <i class="fas fa-info-circle"></i> More Info
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation controls -->
+  <button class="carousel-control prev" id="carouselPrevBtn" aria-label="Previous Slide">
+    <i class="fas fa-chevron-left"></i>
+  </button>
+  <button class="carousel-control next" id="carouselNextBtn" aria-label="Next Slide">
+    <i class="fas fa-chevron-right"></i>
+  </button>
+
+  <!-- Slider Indicator dots -->
+  <div class="carousel-indicators" id="carouselIndicators"></div>
+</header>
+
+<!-- ══════════════ CONTENT ROWS ══════════════ -->
+<main class="content">
+
+  <!-- Trending Now -->
+  <section class="row-section">
+    <h2 class="row-title"><i class="fas fa-bolt"></i> Trending Now</h2>
+    <div class="row-wrapper">
+      <button class="scroll-btn left" onclick="scrollRow(this,-1)"><i class="fas fa-chevron-left"></i></button>
+      <div class="cards-row" id="trending"></div>
+      <button class="scroll-btn right" onclick="scrollRow(this,1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </section>
+
+  <!-- Continue Watching -->
+  <section class="row-section">
+    <h2 class="row-title"><i class="fas fa-history"></i> Continue Watching</h2>
+    <div class="row-wrapper">
+      <button class="scroll-btn left" onclick="scrollRow(this,-1)"><i class="fas fa-chevron-left"></i></button>
+      <div class="cards-row" id="continue"></div>
+      <button class="scroll-btn right" onclick="scrollRow(this,1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </section>
+
+  <!-- Top Picks -->
+  <section class="row-section">
+    <h2 class="row-title"><i class="fas fa-star"></i> Top Picks for You</h2>
+    <div class="row-wrapper">
+      <button class="scroll-btn left" onclick="scrollRow(this,-1)"><i class="fas fa-chevron-left"></i></button>
+      <div class="cards-row" id="toppicks"></div>
+      <button class="scroll-btn right" onclick="scrollRow(this,1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </section>
+
+  <!-- Action & Adventure -->
+  <section class="row-section">
+    <h2 class="row-title"><i class="fas fa-explosion"></i> Action &amp; Adventure</h2>
+    <div class="row-wrapper">
+      <button class="scroll-btn left" onclick="scrollRow(this,-1)"><i class="fas fa-chevron-left"></i></button>
+      <div class="cards-row" id="action"></div>
+      <button class="scroll-btn right" onclick="scrollRow(this,1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </section>
+
+  <!-- My List -->
+  <section class="row-section">
+    <h2 class="row-title"><i class="fas fa-heart"></i> My List</h2>
+    <div class="row-wrapper">
+      <button class="scroll-btn left" onclick="scrollRow(this,-1)"><i class="fas fa-chevron-left"></i></button>
+      <div class="cards-row" id="mylist"></div>
+      <button class="scroll-btn right" onclick="scrollRow(this,1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════════ MODAL ══════════════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-hero">
+      <img src="" alt="" id="modalHeroImg" class="modal-hero-img"/>
+      <div class="modal-hero-overlay"></div>
+      <div class="modal-hero-actions">
+        <button class="btn-play"><i class="fas fa-play"></i> Play</button>
+        <button class="btn-circle" id="modalListBtn" onclick="toggleList(this)"><i class="fas fa-plus"></i></button>
+        <button class="btn-circle"><i class="fas fa-thumbs-up"></i></button>
+        <button class="btn-circle"><i class="fas fa-thumbs-down"></i></button>
+        
+        <select style="background: rgba(42,42,42,0.8); border: 2px solid rgba(255,255,255,0.5); color: #f5f5f7; border-radius: 20px; padding: 6px 16px; margin-left: auto; cursor: pointer; font-family: inherit; font-size: 0.9rem; outline: none; appearance: none; -webkit-appearance: none; padding-right: 30px; background-image: url('data:image/svg+xml;utf8,<svg fill=\"white\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/><path d=\"M0 0h24v24H0z\" fill=\"none\"/></svg>'); background-repeat: no-repeat; background-position-x: 100%; background-position-y: 5px;">
+          <option value="4k">4K Ultra HD</option>
+          <option value="1080p">1080p HD</option>
+          <option value="720p">720p</option>
+          <option value="auto">Auto</option>
+        </select>
+        
+        <select style="background: rgba(42,42,42,0.8); border: 2px solid rgba(255,255,255,0.5); color: #f5f5f7; border-radius: 20px; padding: 6px 16px; margin-left: 8px; cursor: pointer; font-family: inherit; font-size: 0.9rem; outline: none; appearance: none; -webkit-appearance: none; padding-right: 30px; background-image: url('data:image/svg+xml;utf8,<svg fill=\"white\" height=\"24\" viewBox=\"0 0 24 24\" width=\"24\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M7 10l5 5 5-5z\"/><path d=\"M0 0h24v24H0z\" fill=\"none\"/></svg>'); background-repeat: no-repeat; background-position-x: 100%; background-position-y: 5px;">
+          <option value="en">English (Original)</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+          <option value="de">Deutsch</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ja">日本語</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="modal-meta" id="modalMeta"></div>
+        <p class="modal-desc" id="modalDesc"></p>
+      </div>
+      <div class="modal-right">
+        <p id="modalCast"></p>
+        <p id="modalGenres"></p>
+      </div>
+    </div>
+    <div class="modal-episodes" id="modalEpisodes"></div>
+  </div>
+</div>
+
+<!-- ══════════════ SEARCH RESULTS ══════════════ -->
+<div class="search-results" id="searchResults"></div>
+
+<!-- ══════════════ PROFILE PANEL ══════════════ -->
+<div class="panel-overlay" id="profilePanel">
+  <div class="panel" id="profilePanelCard">
+    <button class="panel-close" id="closeProfilePanel"><i class="fas fa-times"></i></button>
+    <div class="panel-hero-bg"></div>
+    <div class="panel-content">
+      <div class="panel-avatar-wrap">
+        <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=user1" class="panel-avatar" alt="Avatar"/>
+        <div class="panel-avatar-badge"><i class="fas fa-pen"></i></div>
+      </div>
+      <h2 class="panel-name">Alex Flix</h2>
+      <p class="panel-email">alex@streamflix.io</p>
+      <div class="panel-plan-badge"><i class="fas fa-crown"></i> Premium Plan</div>
+
+      <div class="panel-stats">
+        <div class="stat-card">
+          <div class="stat-value" id="statWatched">47</div>
+          <div class="stat-label">Titles Watched</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="statList">0</div>
+          <div class="stat-label">My List</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">2,340</div>
+          <div class="stat-label">Minutes Streamed</div>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title"><i class="fas fa-user"></i> Account Details</div>
+        <div class="panel-field">
+          <span class="field-label">Display Name</span>
+          <span class="field-value">Alex Flix</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Email</span>
+          <span class="field-value">alex@streamflix.io</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Member Since</span>
+          <span class="field-value">January 2023</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Country</span>
+          <span class="field-value">🇺🇸 United States</span>
+        </div>
+        <div class="panel-field">
+          <span class="field-label">Subscription</span>
+          <span class="field-value premium">Premium 4K</span>
+        </div>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title"><i class="fas fa-clock"></i> Recently Watched</div>
+        <div class="panel-recently" id="panelRecent"></div>
+      </div>
+
+      <div class="panel-actions">
+        <button class="panel-btn-secondary" id="openSettingsFromProfile"><i class="fas fa-gear"></i> Settings</button>
+        <button class="panel-btn-danger" id="signoutFromProfile"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SETTINGS PANEL ══════════════ -->
+<div class="panel-overlay" id="settingsPanel">
+  <div class="panel" id="settingsPanelCard">
+    <button class="panel-close" id="closeSettingsPanel"><i class="fas fa-times"></i></button>
+    <div class="panel-content">
+      <h2 class="settings-title"><i class="fas fa-gear"></i> Settings</h2>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Playback</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Autoplay next episode</div>
+            <div class="setting-desc">Automatically plays the next episode in a series</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="settingAutoplay"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Autoplay previews</div>
+            <div class="setting-desc">Play previews while browsing</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="settingPreviews"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Video quality</div>
+            <div class="setting-desc">Best available resolution</div>
+          </div>
+          <select class="setting-select" id="settingQuality">
+            <option value="auto">Auto</option>
+            <option value="4k" selected>4K Ultra HD</option>
+            <option value="1080p">1080p</option>
+            <option value="720p">720p</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Notifications</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">New releases</div>
+            <div class="setting-desc">Get notified when new titles arrive</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked id="settingNotifyNew"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Continue watching reminders</div>
+            <div class="setting-desc">Reminders about unfinished shows</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="settingNotifyReminder"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Appearance</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Mature content filter</div>
+            <div class="setting-desc">Hide titles rated 18+ from browse</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="settingMature"/>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Subtitles language</div>
+            <div class="setting-desc">Default subtitle language</div>
+          </div>
+          <select class="setting-select" id="settingSubtitles">
+            <option value="off">Off</option>
+            <option value="en" selected>English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-group-title">Data & Privacy</div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Download viewing activity</div>
+            <div class="setting-desc">Export your watch history</div>
+          </div>
+          <button class="setting-action-btn" id="downloadHistory"><i class="fas fa-download"></i> Download</button>
+        </div>
+        <div class="setting-row">
+          <div class="setting-info">
+            <div class="setting-name">Clear watch history</div>
+            <div class="setting-desc">Remove all viewing history</div>
+          </div>
+          <button class="setting-action-btn danger" id="clearHistory"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+      </div>
+
+      <div class="settings-footer">
+        <button class="panel-btn-primary" id="saveSettings"><i class="fas fa-check"></i> Save Settings</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SIGN OUT CONFIRM ══════════════ -->
+<div class="signout-overlay" id="signoutOverlay">
+  <div class="signout-card">
+    <div class="signout-icon"><i class="fas fa-sign-out-alt"></i></div>
+    <h3>Sign Out of StreamFlix?</h3>
+    <p>You can sign back in at any time.</p>
+    <div class="signout-actions">
+      <button class="signout-cancel" id="signoutCancel">Cancel</button>
+      <button class="signout-confirm" id="signoutConfirm"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-social">
+      <a href="#"><i class="fab fa-facebook-f"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+      <a href="#"><i class="fab fa-youtube"></i></a>
+    </div>
+    <div class="footer-links">
+      <a href="#">Audio Description</a><a href="#">Help Centre</a>
+      <a href="#">Gift Cards</a><a href="#">Media Centre</a>
+      <a href="#">Investor Relations</a><a href="#">Jobs</a>
+      <a href="#">Terms of Use</a><a href="#">Privacy</a>
+      <a href="#">Cookie Preferences</a><a href="#">Corporate Information</a>
+      <a href="#">Contact Us</a>
+    </div>
+    <p class="footer-copy">© 2025 StreamFlix. All rights reserved. Built for educational purposes.</p>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

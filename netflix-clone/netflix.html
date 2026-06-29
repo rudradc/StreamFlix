@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* ═══════════════════════════════════════
+   RESET & DESIGN TOKENS
+   ═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#141414;--surface:#181818;--surface2:#2F2F2F;
+  --red:#E50914;--red-hover:#F40612;
+  --green:#46D369;--white:#FFFFFF;--muted:#808080;--muted2:#999;
+  --font:'Inter','Helvetica Neue',Helvetica,Arial,sans-serif;
+  --radius:4px;--nav-h:68px;
+  --ease:cubic-bezier(.4,0,.2,1);--ease-out:cubic-bezier(0,.55,.45,1);
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--font);overflow-x:hidden;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:var(--font);cursor:pointer;border:none;outline:none}
+img{display:block;max-width:100%}
+::-webkit-scrollbar{width:5px;height:0}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#444;border-radius:3px}
+
+/* ═══════════════════════════════════════
+   AMBIENT PARTICLES
+   ═══════════════════════════════════════ */
+#particles-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.35;
+}
+
+/* ═══════════════════════════════════════
+   FLOATING / ENTRANCE ANIMATIONS
+   ═══════════════════════════════════════ */
+@keyframes floatUp{
+  from{opacity:0;transform:translateY(50px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes floatSlow{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-12px)}
+}
+@keyframes shimmer{
+  0%{background-position:-400px 0}
+  100%{background-position:400px 0}
+}
+@keyframes slideInLeft{
+  from{opacity:0;transform:translateX(-60px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes slideInRight{
+  from{opacity:0;transform:translateX(60px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes pulseGlow{
+  0%,100%{box-shadow:0 0 20px rgba(229,9,20,.3)}
+  50%{box-shadow:0 0 40px rgba(229,9,20,.6)}
+}
+@keyframes fadeScale{
+  from{opacity:0;transform:scale(.92)}
+  to{opacity:1;transform:scale(1)}
+}
+@keyframes gradientShift{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+@keyframes borderPulse{
+  0%,100%{border-color:rgba(229,9,20,.4)}
+  50%{border-color:rgba(229,9,20,.9)}
+}
+.float-in{animation:floatUp .8s var(--ease) both}
+.float-in-d1{animation-delay:.1s}
+.float-in-d2{animation-delay:.2s}
+.float-in-d3{animation-delay:.35s}
+.float-in-d4{animation-delay:.5s}
+.float-in-d5{animation-delay:.7s}
+
+/* ═══════════════════════════════════════
+   PROFILES PAGE
+   ═══════════════════════════════════════ */
+.profiles-gate{
+  position:fixed;inset:0;z-index:10000;
+  background:linear-gradient(135deg,#0a0a0a 0%,#141414 40%,#1a0a0a 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .8s var(--ease),visibility .8s;
+}
+.profiles-gate::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(229,9,20,.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.profiles-gate.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.profiles-gate .pf-logo{margin-bottom:48px;animation:floatUp .6s var(--ease) both}
+.profiles-gate .pf-logo svg{height:52px;filter:drop-shadow(0 0 30px rgba(229,9,20,.5))}
+.profiles-gate h1{
+  font-size:3.5rem;font-weight:400;color:var(--white);margin-bottom:36px;
+  animation:floatUp .6s var(--ease) .15s both;
+}
+.pf-grid{display:flex;gap:32px;margin-bottom:48px;flex-wrap:wrap;justify-content:center}
+.pf-card{
+  display:flex;flex-direction:column;align-items:center;cursor:pointer;
+  animation:floatUp .6s var(--ease) both;
+}
+.pf-card:nth-child(1){animation-delay:.2s}
+.pf-card:nth-child(2){animation-delay:.3s}
+.pf-card:nth-child(3){animation-delay:.4s}
+.pf-card:nth-child(4){animation-delay:.5s}
+.pf-card:nth-child(5){animation-delay:.6s}
+.pf-card .pf-avatar{
+  width:160px;height:160px;border-radius:var(--radius);
+  border:3px solid transparent;overflow:hidden;background:#333;
+  transition:all .35s var(--ease);position:relative;
+}
+.pf-card:hover .pf-avatar{
+  border-color:#e5e5e5;transform:scale(1.08);
+  box-shadow:0 0 30px rgba(255,255,255,.15);
+}
+.pf-card .pf-avatar img{width:100%;height:100%;object-fit:cover}
+.pf-card .pf-name{margin-top:14px;font-size:15px;color:var(--muted);transition:color .25s}
+.pf-card:hover .pf-name{color:var(--white)}
+.pf-add{
+  width:160px;height:160px;border-radius:var(--radius);
+  background:rgba(255,255,255,.03);border:3px solid var(--muted);
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;color:var(--muted);transition:all .35s var(--ease);
+}
+.pf-add:hover{border-color:var(--white);color:var(--white);background:rgba(255,255,255,.06);transform:scale(1.08)}
+.pf-manage{
+  background:transparent;border:1px solid var(--muted);
+  color:var(--muted);padding:10px 28px;font-size:14px;letter-spacing:3px;
+  text-transform:uppercase;border-radius:var(--radius);
+  transition:all .25s;animation:floatUp .6s var(--ease) .7s both;
+}
+.pf-manage:hover{border-color:var(--white);color:var(--white)}
+
+/* ═══════════════════════════════════════
+   NAVBAR
+   ═══════════════════════════════════════ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;z-index:5000;
+  height:var(--nav-h);display:flex;align-items:center;
+  padding:0 56px;gap:24px;
+  background:linear-gradient(180deg,rgba(0,0,0,.85) 0%,transparent 100%);
+  transition:background .4s;
+}
+.navbar.scrolled{background:rgba(20,20,20,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav-logo svg{height:28px;display:block;filter:drop-shadow(0 0 10px rgba(229,9,20,.4));transition:filter .3s}
+.nav-logo:hover svg{filter:drop-shadow(0 0 20px rgba(229,9,20,.7))}
+.nav-links{display:flex;gap:20px;list-style:none;margin-left:16px}
+.nav-links a{font-size:13.5px;color:#e5e5e5;transition:color .25s;position:relative}
+.nav-links a:hover,.nav-links a.active{color:var(--white);font-weight:600}
+.nav-links a.active::after{
+  content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  width:16px;height:2px;background:var(--red);border-radius:1px;
+}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:22px}
+
+/* Search */
+.nav-search{display:flex;align-items:center;position:relative}
+.nav-search .search-icon{color:var(--white);font-size:18px;cursor:pointer;transition:all .25s}
+.nav-search .search-icon:hover{transform:scale(1.15);color:var(--red)}
+.nav-search input{
+  width:0;opacity:0;background:rgba(0,0,0,.85);border:1px solid #e5e5e5;
+  color:var(--white);font-family:var(--font);font-size:14px;
+  padding:8px 12px 8px 38px;transition:width .35s var(--ease),opacity .35s;
+  position:absolute;right:0;top:50%;transform:translateY(-50%);border-radius:var(--radius);
+}
+.nav-search.open input{width:270px;opacity:1}
+.nav-search.open .search-icon{position:absolute;left:10px;z-index:2}
+
+/* Bell */
+.nav-bell{position:relative;cursor:pointer;font-size:18px;color:var(--white);transition:transform .2s}
+.nav-bell:hover{transform:scale(1.15)}
+.nav-bell .bell-dot{
+  position:absolute;top:-2px;right:-3px;width:8px;height:8px;
+  background:var(--red);border-radius:50%;animation:pulseGlow 2s infinite;
+}
+
+/* Profile dropdown */
+.nav-profile{position:relative;display:flex;align-items:center;gap:6px;cursor:pointer}
+.nav-profile .nav-avatar{
+  width:32px;height:32px;border-radius:var(--radius);overflow:hidden;background:#333;
+  border:2px solid transparent;transition:border-color .2s;
+}
+.nav-profile:hover .nav-avatar{border-color:var(--white)}
+.nav-profile .nav-avatar img{width:100%;height:100%;object-fit:cover}
+.nav-profile .caret{font-size:10px;transition:transform .25s;color:var(--white)}
+.nav-profile:hover .caret{transform:rotate(180deg)}
+.profile-dd{
+  position:absolute;top:calc(100% + 14px);right:0;
+  background:rgba(0,0,0,.94);border:1px solid #333;
+  border-radius:var(--radius);min-width:220px;padding:8px 0;
+  opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:all .25s var(--ease);backdrop-filter:blur(20px);
+}
+.profile-dd::before{
+  content:'';position:absolute;top:-14px;right:22px;
+  border:7px solid transparent;border-bottom-color:var(--white);
+}
+.nav-profile:hover .profile-dd{opacity:1;pointer-events:all;transform:translateY(0)}
+.profile-dd .dd-item{
+  padding:11px 18px;font-size:13px;color:#ccc;
+  display:flex;align-items:center;gap:10px;transition:all .15s;
+}
+.profile-dd .dd-item:hover{background:rgba(255,255,255,.06);color:var(--white)}
+.profile-dd .dd-item.signout{border-top:1px solid #333;margin-top:6px;padding-top:14px}
+
+/* ═══════════════════════════════════════
+   NOTIFICATIONS
+   ═══════════════════════════════════════ */
+.notif-panel{
+  position:fixed;top:var(--nav-h);right:56px;width:400px;
+  background:rgba(0,0,0,.96);border:1px solid #333;border-radius:0 0 8px 8px;
+  max-height:420px;overflow-y:auto;z-index:6000;
+  opacity:0;pointer-events:none;transform:translateY(-10px);
+  transition:all .3s var(--ease);backdrop-filter:blur(20px);
+}
+.notif-panel.open{opacity:1;pointer-events:all;transform:translateY(0)}
+.notif-panel::before{
+  content:'';position:absolute;top:-14px;right:42px;
+  border:7px solid transparent;border-bottom-color:var(--white);
+}
+.notif-panel h3{padding:16px 18px 10px;font-size:18px;font-weight:700;border-bottom:1px solid #333}
+.notif-item{
+  display:flex;gap:14px;padding:16px 18px;border-bottom:1px solid #1e1e1e;
+  cursor:pointer;transition:background .15s;
+}
+.notif-item:hover{background:rgba(255,255,255,.04)}
+.notif-item img{width:100px;height:56px;object-fit:cover;border-radius:var(--radius);flex-shrink:0}
+.notif-item .ni-text{font-size:13px;color:#ccc;line-height:1.45}
+.notif-item .ni-text strong{color:var(--white);display:block;margin-bottom:3px}
+.notif-item .ni-time{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* ═══════════════════════════════════════
+   HERO — FLOATING + PARALLAX
+   ═══════════════════════════════════════ */
+.hero{
+  position:relative;height:100vh;min-height:640px;
+  display:flex;align-items:flex-end;padding:0 56px 15vh;
+  overflow:hidden;
+}
+.hero-bg{position:absolute;inset:0;z-index:0;will-change:transform}
+.hero-bg img{width:100%;height:115%;object-fit:cover;object-position:center 20%;transition:opacity 1.2s}
+/* Auto-sliding hero backgrounds */
+.hero-bg img.hero-slide{
+  position:absolute;inset:0;width:100%;height:115%;object-fit:cover;
+  opacity:0;transition:opacity 1.2s ease-in-out;
+}
+.hero-bg img.hero-slide.active{opacity:1}
+.hero-grad{
+  position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(90deg,rgba(20,20,20,.98) 0%,rgba(20,20,20,.5) 35%,transparent 55%),
+    linear-gradient(0deg,var(--bg) 0%,rgba(20,20,20,.5) 20%,transparent 50%),
+    linear-gradient(180deg,rgba(20,20,20,.7) 0%,transparent 20%);
+}
+/* Floating vignette ring */
+.hero-vignette{
+  position:absolute;inset:0;z-index:1;
+  background:radial-gradient(ellipse at 80% 40%,transparent 40%,rgba(0,0,0,.4) 100%);
+  pointer-events:none;
+}
+.hero-content{
+  position:relative;z-index:2;max-width:560px;
+}
+.hero-content > *{animation:floatUp .7s var(--ease) both}
+.hero-content > :nth-child(1){animation-delay:.3s}
+.hero-content > :nth-child(2){animation-delay:.45s}
+.hero-content > :nth-child(3){animation-delay:.55s}
+.hero-content > :nth-child(4){animation-delay:.65s}
+.hero-content > :nth-child(5){animation-delay:.8s}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;font-weight:700;text-transform:uppercase;
+  margin-bottom:14px;letter-spacing:.5px;
+}
+.hero-badge .top10{
+  background:var(--red);color:var(--white);padding:2px 7px;
+  border-radius:2px;font-size:11px;font-weight:800;
+  animation:pulseGlow 3s infinite;
+}
+.hero-title{
+  font-size:3.8rem;font-weight:900;line-height:1.02;margin-bottom:16px;
+  letter-spacing:-1.5px;
+  text-shadow:0 4px 30px rgba(0,0,0,.8);
+}
+.hero-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:14px;flex-wrap:wrap}
+.hero-meta .match-pct{color:var(--green);font-weight:700}
+.hero-meta .maturity{border:1px solid var(--muted);padding:1px 6px;font-size:12px;border-radius:2px;color:#ccc;font-weight:600}
+.hero-meta .quality{border:1px solid var(--muted);padding:1px 6px;font-size:11px;border-radius:2px;color:#ccc;font-weight:700}
+.hero-desc{font-size:15px;line-height:1.55;color:#e5e5e5;margin-bottom:24px;max-width:500px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.hero-buttons{display:flex;gap:10px}
+.btn-play,.btn-info{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:44px;padding:0 30px;font-size:15px;font-weight:700;
+  border-radius:var(--radius);transition:all .25s;
+}
+.btn-play{background:var(--white);color:#000}
+.btn-play:hover{background:#e0e0e0;transform:scale(1.05)}
+.btn-info{background:rgba(109,109,110,.7);color:var(--white)}
+.btn-info:hover{background:rgba(109,109,110,.5);transform:scale(1.05)}
+.hero-maturity{
+  position:absolute;right:56px;bottom:15vh;z-index:2;
+  font-size:13px;color:var(--white);
+}
+.hero-maturity .m-bar{
+  border-left:3px solid var(--muted);padding-left:10px;
+  background:rgba(51,51,51,.6);padding:5px 14px 5px 10px;
+}
+
+/* Hero slide indicators */
+.hero-dots{
+  position:absolute;bottom:calc(15vh - 30px);left:56px;z-index:3;
+  display:flex;gap:8px;
+}
+.hero-dot{
+  width:36px;height:3px;background:rgba(255,255,255,.3);border-radius:2px;
+  cursor:pointer;transition:all .3s;overflow:hidden;position:relative;
+}
+.hero-dot.active{background:rgba(255,255,255,.8)}
+.hero-dot.active::after{
+  content:'';position:absolute;inset:0;background:var(--red);
+  animation:heroProgress 8s linear forwards;
+}
+@keyframes heroProgress{from{width:0}to{width:100%}}
+
+/* ═══════════════════════════════════════
+   CONTENT ROWS
+   ═══════════════════════════════════════ */
+.content-area{position:relative;z-index:3;margin-top:-120px;padding-bottom:80px}
+.row-section{margin-bottom:4px;padding:0 0 16px}
+.row-section.visible .row-title,.row-section.visible .row-explore{animation:slideInLeft .5s var(--ease) both}
+.row-section.visible .row-slider{animation:fadeScale .6s var(--ease) .1s both}
+.row-header{
+  display:flex;align-items:baseline;gap:8px;
+  padding:0 56px;margin-bottom:8px;
+}
+.row-title{font-size:17px;font-weight:700;color:#e5e5e5;transition:color .2s}
+.row-section:hover .row-title{color:var(--white)}
+.row-explore{
+  font-size:12px;color:#54b9c5;font-weight:600;
+  opacity:0;transition:all .3s;cursor:pointer;transform:translateX(-10px);
+}
+.row-section:hover .row-explore{opacity:1;transform:translateX(0)}
+.row-wrapper{position:relative;padding:0}
+.row-slider{
+  display:flex;gap:5px;padding:0 56px;
+  overflow-x:auto;scroll-behavior:smooth;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.row-slider::-webkit-scrollbar{display:none}
+.scroll-btn{
+  position:absolute;top:0;bottom:0;width:56px;
+  background:rgba(20,20,20,.75);border:none;color:var(--white);
+  font-size:30px;z-index:20;cursor:pointer;
+  opacity:0;transition:all .3s;
+  display:flex;align-items:center;justify-content:center;
+}
+.scroll-btn:hover{background:rgba(20,20,20,.95);font-size:36px}
+.row-section:hover .scroll-btn{opacity:1}
+.scroll-btn.left{left:0;border-radius:0 var(--radius) var(--radius) 0}
+.scroll-btn.right{right:0;border-radius:var(--radius) 0 0 var(--radius)}
+
+/* ═══════════════════════════════════════
+   CARDS
+   ═══════════════════════════════════════ */
+.card{
+  flex:0 0 225px;border-radius:var(--radius);
+  overflow:visible;position:relative;cursor:pointer;
+  transition:transform .35s var(--ease),z-index 0s .35s;
+}
+.card:hover{transform:scale(1.45) translateY(-60px);z-index:100;transition:transform .35s var(--ease),z-index 0s}
+.card-img{
+  width:225px;height:127px;border-radius:var(--radius) var(--radius) 0 0;
+  overflow:hidden;position:relative;background:#1a1a1a;
+}
+.card-img img{width:100%;height:100%;object-fit:cover;transition:filter .35s,transform .35s}
+.card:hover .card-img img{filter:brightness(.6);transform:scale(1.05)}
+/* Shimmer loading state */
+.card-img.loading{
+  background:linear-gradient(90deg,#1a1a1a 25%,#252525 50%,#1a1a1a 75%);
+  background-size:400px 100%;animation:shimmer 1.5s infinite;
+}
+.card-detail{
+  position:absolute;top:127px;left:0;right:0;
+  background:var(--surface);border-radius:0 0 var(--radius) var(--radius);
+  padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.85);
+  opacity:0;pointer-events:none;transition:opacity .25s .1s;
+  min-width:225px;
+}
+.card:hover .card-detail{opacity:1;pointer-events:all}
+.cd-icons{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.cd-icon{
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .2s;
+}
+.cd-icon.play-i{background:var(--white);color:#000}
+.cd-icon.play-i:hover{background:#e0e0e0;transform:scale(1.1)}
+.cd-icon.outline{background:transparent;border:2px solid rgba(255,255,255,.5);color:var(--white);font-size:12px}
+.cd-icon.outline:hover{border-color:var(--white);transform:scale(1.1)}
+.cd-icon.outline.in-list{border-color:var(--green);color:var(--green)}
+.cd-icon.expand{margin-left:auto}
+.cd-title{font-size:12px;font-weight:700;margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cd-meta{display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:5px;flex-wrap:wrap}
+.cd-meta .match{color:var(--green);font-weight:700}
+.cd-meta .mat{border:1px solid var(--muted);padding:0 4px;font-size:10px;border-radius:2px;color:#ccc}
+.cd-genres{font-size:10px;color:var(--muted2)}
+.cd-genres span::after{content:' · ';color:#555}
+.cd-genres span:last-child::after{content:''}
+
+/* Progress bar */
+.card-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:#333;z-index:2}
+.card-progress-bar{height:100%;background:var(--red);border-radius:0 2px 2px 0}
+
+/* Trending rank */
+.card.trending-card{flex:0 0 280px;display:flex;align-items:flex-end;gap:0}
+.card.trending-card .rank-num{
+  font-size:160px;font-weight:900;line-height:.7;
+  color:transparent;-webkit-text-stroke:3px #555;
+  margin-right:-24px;z-index:1;flex-shrink:0;font-style:italic;
+  user-select:none;transition:all .3s;
+}
+.card.trending-card:hover .rank-num{-webkit-text-stroke-color:var(--red);filter:drop-shadow(0 0 10px rgba(229,9,20,.4))}
+.card.trending-card .card-img{flex-shrink:0}
+.card.trending-card:hover{transform:scale(1.25) translateY(-40px)}
+
+/* ═══════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:flex;justify-content:center;padding:32px 0;overflow-y:auto;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  width:850px;max-width:95vw;background:var(--surface);
+  border-radius:8px;overflow:hidden;position:relative;
+  margin:auto;animation:fadeScale .35s var(--ease) both;
+}
+.modal-close{
+  position:absolute;top:12px;right:12px;z-index:10;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--surface);color:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;border:none;transition:all .2s;
+}
+.modal-close:hover{background:#333;transform:rotate(90deg)}
+.modal-hero{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden}
+.modal-hero img{width:100%;height:100%;object-fit:cover}
+.modal-hero-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,var(--surface) 0%,transparent 50%),
+    linear-gradient(90deg,rgba(24,24,24,.6) 0%,transparent 40%);
+}
+.modal-hero-content{position:absolute;bottom:28px;left:36px;right:36px}
+.modal-hero-title{font-size:2.2rem;font-weight:900;margin-bottom:14px;text-shadow:0 3px 20px rgba(0,0,0,.7)}
+.modal-hero-actions{display:flex;gap:8px;align-items:center}
+.modal-body{display:flex;gap:28px;padding:24px 36px 36px}
+.modal-left{flex:1.5}
+.modal-right{flex:1;font-size:13px;color:#ccc;line-height:1.6}
+.modal-right strong{color:var(--muted);font-weight:400}
+.ml-meta{display:flex;gap:8px;align-items:center;font-size:14px;margin-bottom:16px;flex-wrap:wrap}
+.ml-meta .match{color:var(--green);font-weight:700}
+.ml-meta .mat{border:1px solid var(--muted);padding:1px 5px;font-size:12px;border-radius:2px}
+.ml-meta .qual{border:1px solid var(--muted);padding:1px 5px;font-size:11px;border-radius:2px;font-weight:700}
+.ml-desc{font-size:14px;line-height:1.6;color:#d2d2d2;margin-bottom:18px}
+
+/* Tabs */
+.modal-tabs{border-top:1px solid #333;padding:0 36px}
+.tab-btns{display:flex;gap:28px;border-bottom:1px solid #333}
+.tab-btn{
+  padding:18px 0;font-size:15px;font-weight:700;color:var(--muted);
+  background:none;border:none;cursor:pointer;
+  border-bottom:3px solid transparent;transition:all .2s;
+}
+.tab-btn.active{color:var(--white);border-bottom-color:var(--red)}
+.tab-btn:hover{color:var(--white)}
+.tab-content{padding:22px 0 36px}
+.ep-season-sel{
+  background:#242424;border:1px solid #444;color:var(--white);
+  font-family:var(--font);font-size:14px;font-weight:600;
+  padding:8px 14px;border-radius:var(--radius);margin-bottom:18px;cursor:pointer;
+}
+.episode-item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px 8px;border-bottom:1px solid #2a2a2a;
+  transition:background .15s;border-radius:var(--radius);
+}
+.episode-item:hover{background:rgba(255,255,255,.04)}
+.ep-num{font-size:24px;font-weight:500;color:var(--muted);min-width:36px;text-align:center;padding-top:10px}
+.ep-thumb{
+  width:145px;height:82px;border-radius:var(--radius);overflow:hidden;
+  position:relative;flex-shrink:0;cursor:pointer;
+}
+.ep-thumb img{width:100%;height:100%;object-fit:cover}
+.ep-thumb .ep-play-hover{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.55);opacity:0;transition:opacity .2s;font-size:34px;color:var(--white);
+}
+.ep-thumb:hover .ep-play-hover{opacity:1}
+.ep-info{flex:1}
+.ep-info-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.ep-info-top h4{font-size:14px;font-weight:600}
+.ep-info-top span{font-size:13px;color:var(--muted)}
+.ep-info p{font-size:13px;color:var(--muted);line-height:1.5}
+
+/* More Like This */
+.mlt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mlt-card{border-radius:var(--radius);overflow:hidden;background:#222;cursor:pointer;transition:all .25s}
+.mlt-card:hover{transform:scale(1.03);box-shadow:0 8px 30px rgba(0,0,0,.6)}
+.mlt-card img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.mlt-card-info{padding:14px}
+.mlt-card-info .mlt-meta{display:flex;gap:6px;font-size:11px;color:var(--muted);margin-bottom:6px;align-items:center}
+.mlt-card-info .mlt-meta .match{color:var(--green);font-weight:700}
+.mlt-card-info p{font-size:12px;color:#aaa;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ═══════════════════════════════════════
+   SEARCH
+   ═══════════════════════════════════════ */
+.search-overlay{
+  position:fixed;top:var(--nav-h);left:0;right:0;bottom:0;z-index:4500;
+  background:var(--bg);padding:28px 56px;overflow-y:auto;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.search-overlay.open{opacity:1;pointer-events:all}
+.search-overlay h2{font-size:22px;margin-bottom:22px;color:#e5e5e5}
+.search-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:32px}
+.search-grid .s-card{
+  border-radius:var(--radius);overflow:hidden;cursor:pointer;
+  transition:all .25s;position:relative;
+}
+.search-grid .s-card:hover{transform:scale(1.05);box-shadow:0 10px 40px rgba(0,0,0,.7)}
+.search-grid .s-card img{width:100%;aspect-ratio:16/9;object-fit:cover}
+.search-grid .s-card .s-title{
+  position:absolute;bottom:0;left:0;right:0;padding:8px 10px;
+  background:linear-gradient(transparent,rgba(0,0,0,.9));font-size:12px;font-weight:600;
+}
+.search-empty{text-align:center;padding:100px 0;color:var(--muted)}
+.search-empty i{font-size:60px;margin-bottom:20px;display:block;opacity:.4}
+.search-empty p{font-size:18px}
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+.nf-footer{padding:80px 56px 40px;color:var(--muted);font-size:13px}
+.nf-footer .footer-social{display:flex;gap:24px;margin-bottom:28px}
+.nf-footer .footer-social a{color:var(--white);font-size:22px;transition:all .2s}
+.nf-footer .footer-social a:hover{opacity:.7;transform:translateY(-2px)}
+.nf-footer .footer-links{display:flex;flex-wrap:wrap;gap:8px 36px;margin-bottom:24px}
+.nf-footer .footer-links a{font-size:12.5px;color:var(--muted);transition:color .15s;text-decoration:underline}
+.nf-footer .footer-links a:hover{color:#e5e5e5}
+.nf-footer .footer-copy{font-size:12px;margin-top:24px}
+
+/* ═══════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════ */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════ */
+@media(max-width:1024px){
+  .navbar{padding:0 28px}
+  .hero{padding:0 28px 14vh}
+  .hero-dots{left:28px}
+  .row-header,.row-slider{padding-left:28px;padding-right:28px}
+  .scroll-btn{width:28px}
+  .hero-title{font-size:2.8rem}
+  .modal{max-width:96vw}
+  .modal-body{flex-direction:column}
+  .content-area{margin-top:-80px}
+  .search-overlay{padding:20px 28px}
+  .nf-footer{padding:60px 28px 30px}
+  .hero-maturity{right:28px}
+}
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hero-title{font-size:2rem}
+  .hero-desc{font-size:13px}
+  .card{flex:0 0 165px}
+  .card-img{width:165px;height:93px}
+  .card-detail{top:93px;min-width:165px}
+  .card:hover{transform:scale(1.2) translateY(-30px)}
+  .mlt-grid{grid-template-columns:repeat(2,1fr)}
+  .pf-grid{gap:16px}
+  .pf-card .pf-avatar{width:120px;height:120px}
+  .profiles-gate h1{font-size:2.2rem}
+  .hero-maturity{display:none}
+  .hero-dots{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- AMBIENT PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ═══════════════ PROFILES GATE ═══════════════ -->
+<div class="profiles-gate" id="profilesGate">
+  <div class="pf-logo">
+    <svg viewBox="0 0 111 30" xmlns="http://www.w3.org/2000/svg"><path fill="#E50914" d="M105.062 14.28L111 30c-1.75-.25-3.499-.563-5.28-.845l-3.345-8.686-3.437 7.969c-1.687-.282-3.344-.625-5.031-.938l6.093-13.874L94.19 0h5.063l3.062 7.874L105.186 0h5.063l-5.187 14.28zM90.47 0l-5.593 14.28L90.47 30l-5.593-14.28L90.47 0zm0 0h-4.906l.093 22.278-3.94-22.278h-4.22l-3.937 22.278.062-22.278h-4.812L74.343 30h5.25l3.343-18.812L86.342 30h5.25L90.469 0zM46.655 0l.062 24.97c1.5.093 3.03.187 4.531.28V0h-4.593zm-7.405 24.031c-2.782 0-3.563-1.874-3.563-4.593V0h-4.594v20.156c0 5.124 2.375 8.937 8.188 8.937 1.28 0 2.593-.156 3.812-.468V24.5c-1.25.344-2.562.531-3.843.531zM21.062 10.937L14.75 0H9.5l8.75 14.938V30h4.625V14.938L31.594 0H26.47l-5.406 10.937zM0 0v30h4.625V18h5.78V13.75H4.626V4.25h7.376V0H0z"/></svg>
+  </div>
+  <h1>Who's watching?</h1>
+  <div class="pf-grid" id="pfGrid"></div>
+  <button class="pf-manage">Manage Profiles</button>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div id="mainApp" style="display:none">
+
+<nav class="navbar" id="navbar">
+  <a class="nav-logo" href="#">
+    <svg viewBox="0 0 111 30" height="28" xmlns="http://www.w3.org/2000/svg"><path fill="#E50914" d="M105.062 14.28L111 30c-1.75-.25-3.499-.563-5.28-.845l-3.345-8.686-3.437 7.969c-1.687-.282-3.344-.625-5.031-.938l6.093-13.874L94.19 0h5.063l3.062 7.874L105.186 0h5.063l-5.187 14.28zM90.47 0l-5.593 14.28L90.47 30l-5.593-14.28L90.47 0zm0 0h-4.906l.093 22.278-3.94-22.278h-4.22l-3.937 22.278.062-22.278h-4.812L74.343 30h5.25l3.343-18.812L86.342 30h5.25L90.469 0zM46.655 0l.062 24.97c1.5.093 3.03.187 4.531.28V0h-4.593zm-7.405 24.031c-2.782 0-3.563-1.874-3.563-4.593V0h-4.594v20.156c0 5.124 2.375 8.937 8.188 8.937 1.28 0 2.593-.156 3.812-.468V24.5c-1.25.344-2.562.531-3.843.531zM21.062 10.937L14.75 0H9.5l8.75 14.938V30h4.625V14.938L31.594 0H26.47l-5.406 10.937zM0 0v30h4.625V18h5.78V13.75H4.626V4.25h7.376V0H0z"/></svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#">TV Shows</a></li>
+    <li><a href="#">Movies</a></li>
+    <li><a href="#">New & Popular</a></li>
+    <li><a href="#">My List</a></li>
+    <li><a href="#">Browse by Language</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-search" id="navSearch">
+      <i class="fas fa-search search-icon" id="searchToggle"></i>
+      <input type="text" id="searchInput" placeholder="Titles, people, genres">
+    </div>
+    <div class="nav-bell" id="bellIcon"><i class="fas fa-bell"></i><span class="bell-dot"></span></div>
+    <div class="nav-profile" id="navProfile">
+      <div class="nav-avatar" id="navAvatar"></div>
+      <i class="fas fa-caret-down caret"></i>
+      <div class="profile-dd">
+        <div class="dd-item" onclick="switchProfiles()"><i class="fas fa-pencil" style="font-size:12px"></i> Manage Profiles</div>
+        <div class="dd-item"><i class="fas fa-arrow-right-arrow-left" style="font-size:12px"></i> Transfer Profile</div>
+        <div class="dd-item"><i class="fas fa-user" style="font-size:12px"></i> Account</div>
+        <div class="dd-item"><i class="fas fa-question-circle" style="font-size:12px"></i> Help Centre</div>
+        <div class="dd-item signout" onclick="switchProfiles()"><i class="fas fa-sign-out-alt" style="font-size:12px"></i> Sign out of Netflix</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="notif-panel" id="notifPanel"><h3>Notifications</h3><div id="notifList"></div></div>
+<div class="search-overlay" id="searchOverlay"><div id="searchResults"></div></div>
+
+<header class="hero" id="heroSection">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-grad"></div>
+  <div class="hero-vignette"></div>
+  <div class="hero-content" id="heroContent"></div>
+  <div class="hero-maturity" id="heroMaturity"></div>
+  <div class="hero-dots" id="heroDots"></div>
+</header>
+
+<main class="content-area" id="contentArea"></main>
+
+<footer class="nf-footer">
+  <div class="footer-social">
+    <a href="#"><i class="fab fa-facebook-f"></i></a>
+    <a href="#"><i class="fab fa-instagram"></i></a>
+    <a href="#"><i class="fab fa-twitter"></i></a>
+    <a href="#"><i class="fab fa-youtube"></i></a>
+  </div>
+  <div class="footer-links">
+    <a href="#">Audio Description</a><a href="#">Help Centre</a><a href="#">Gift Cards</a>
+    <a href="#">Media Centre</a><a href="#">Investor Relations</a><a href="#">Jobs</a>
+    <a href="#">Terms of Use</a><a href="#">Privacy</a><a href="#">Legal Notices</a>
+    <a href="#">Cookie Preferences</a><a href="#">Corporate Information</a><a href="#">Contact Us</a>
+  </div>
+  <p class="footer-copy">© 1997-2025 Netflix, Inc.</p>
+</footer>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"><div class="modal" id="modal"></div></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  DATA — 22 titles with reliable images
+// ══════════════════════════════════════════════
+const DATA=[
+{id:"st",title:"Stranger Things",type:"series",year:2022,maturity:"TV-14",seasons:4,genres:["Sci-Fi","Drama","Horror"],cast:["Millie Bobby Brown","Finn Wolfhard","Winona Ryder"],desc:"When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl.",match:98,
+backdrop:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&q=80",
+progress:0,episodes:[{t:"The Vanishing of Will Byers",d:"On his way home, young Will sees something terrifying.",dur:"47m",th:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80"},{t:"The Weirdo on Maple Street",d:"Lucas, Mike and Dustin try to talk to the girl they found.",dur:"55m",th:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80"},{t:"Holly, Jolly",d:"An agitated Joyce is convinced Will is trying to talk to her.",dur:"51m",th:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80"}]},
+
+{id:"bb",title:"Breaking Bad",type:"series",year:2013,maturity:"TV-MA",seasons:5,genres:["Drama","Crime","Thriller"],cast:["Bryan Cranston","Aaron Paul","Anna Gunn"],desc:"A chemistry teacher diagnosed with inoperable cancer turns to manufacturing meth to secure his family's future.",match:99,
+backdrop:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=500&q=80",
+progress:.65,episodes:[{t:"Pilot",d:"Walter White is diagnosed with inoperable lung cancer.",dur:"58m",th:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=300&q=80"},{t:"Cat's in the Bag",d:"Walt and Jesse attempt to tie up loose ends.",dur:"48m",th:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=300&q=80"},{t:"…And the Bag's in the River",d:"Walt wrestles with a difficult decision.",dur:"48m",th:"https://images.unsplash.com/photo-1574267432553-4b4628081c31?w=300&q=80"}]},
+
+{id:"inc",title:"Inception",type:"movie",year:2010,maturity:"PG-13",duration:"2h 28m",genres:["Sci-Fi","Action","Thriller"],cast:["Leonardo DiCaprio","Joseph Gordon-Levitt","Elliot Page"],desc:"A thief who steals corporate secrets through dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",match:97,
+backdrop:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=500&q=80",
+progress:0,episodes:[{t:"The Dream Heist",d:"Cobb and his team execute a complex extraction.",dur:"2h28m",th:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&q=80"},{t:"Deeper Levels",d:"The team descends into layered dreams.",dur:"45m",th:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&q=80"},{t:"Limbo",d:"Cobb confronts his deepest memories.",dur:"35m",th:"https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=300&q=80"}]},
+
+{id:"int",title:"Interstellar",type:"movie",year:2014,maturity:"PG-13",duration:"2h 49m",genres:["Sci-Fi","Drama","Adventure"],cast:["Matthew McConaughey","Anne Hathaway","Jessica Chastain"],desc:"A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",match:96,
+backdrop:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=500&q=80",
+progress:.3,episodes:[{t:"The Departure",d:"Cooper leaves his family behind.",dur:"50m",th:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=300&q=80"},{t:"Miller's Planet",d:"The team lands on a water world.",dur:"40m",th:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=300&q=80"},{t:"The Tesseract",d:"Cooper enters the fifth dimension.",dur:"55m",th:"https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=300&q=80"}]},
+
+{id:"dk",title:"The Dark Knight",type:"movie",year:2008,maturity:"PG-13",duration:"2h 32m",genres:["Action","Drama","Crime"],cast:["Christian Bale","Heath Ledger","Aaron Eckhart"],desc:"When the menace known as the Joker wreaks havoc on Gotham, Batman must accept one of the greatest psychological tests.",match:99,
+backdrop:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500&q=80",
+progress:0,episodes:[{t:"The Opening Heist",d:"The Joker executes a daring bank robbery.",dur:"12m",th:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&q=80"},{t:"Harvey Dent",d:"Gotham's white knight emerges.",dur:"45m",th:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&q=80"},{t:"The Final Choice",d:"Batman faces his ultimate moral test.",dur:"40m",th:"https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=300&q=80"}]},
+
+{id:"wit",title:"The Witcher",type:"series",year:2021,maturity:"TV-MA",seasons:3,genres:["Fantasy","Action","Drama"],cast:["Henry Cavill","Freya Allan","Anya Chalotra"],desc:"Geralt of Rivia, a solitary monster hunter, struggles to find his place in a world where people often prove more wicked than beasts.",match:91,
+backdrop:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=500&q=80",
+progress:.8,episodes:[{t:"The End's Beginning",d:"Geralt arrives at Blaviken.",dur:"60m",th:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&q=80"},{t:"Four Marks",d:"Yennefer's transformation begins.",dur:"58m",th:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&q=80"},{t:"Betrayer Moon",d:"Geralt investigates a curse.",dur:"62m",th:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&q=80"}]},
+
+{id:"che",title:"Chernobyl",type:"series",year:2019,maturity:"TV-MA",seasons:1,genres:["Drama","History","Thriller"],cast:["Jared Harris","Stellan Skarsgård","Emily Watson"],desc:"A dramatization of the true story of one of the worst man-made catastrophes in history — the nuclear disaster at Chernobyl.",match:96,
+backdrop:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=500&q=80",
+progress:0,episodes:[{t:"1:23:45",d:"The plant suffers a catastrophic explosion.",dur:"62m",th:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=300&q=80"},{t:"Please Remain Calm",d:"Officials scramble to contain the fallout.",dur:"58m",th:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=300&q=80"},{t:"Open Wide, O Earth",d:"Evacuations begin around Pripyat.",dur:"65m",th:"https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?w=300&q=80"}]},
+
+{id:"end",title:"Avengers: Endgame",type:"movie",year:2019,maturity:"PG-13",duration:"3h 1m",genres:["Action","Sci-Fi","Adventure"],cast:["Robert Downey Jr.","Chris Evans","Scarlett Johansson"],desc:"After the devastating events of Infinity War, the Avengers assemble once more to reverse Thanos' actions and restore balance.",match:92,
+backdrop:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=500&q=80",
+progress:.45,episodes:[{t:"Time Heist",d:"The Avengers plan their mission through time.",dur:"45m",th:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&q=80"},{t:"The Battle",d:"The final battle against Thanos begins.",dur:"55m",th:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&q=80"},{t:"I Am Iron Man",d:"Tony Stark makes the ultimate sacrifice.",dur:"20m",th:"https://images.unsplash.com/photo-1635805737707-575885ab0820?w=300&q=80"}]},
+
+{id:"fc",title:"Fight Club",type:"movie",year:1999,maturity:"R",duration:"2h 19m",genres:["Drama","Thriller"],cast:["Brad Pitt","Edward Norton","Helena Bonham Carter"],desc:"An insomniac office worker and a devil-may-care soap maker form an underground fight club that evolves into much more.",match:95,
+backdrop:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500&q=80",
+progress:0,episodes:[{t:"The Narrator",d:"An insomniac meets a mysterious soap salesman.",dur:"40m",th:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=300&q=80"},{t:"Fight Club",d:"The underground club grows rapidly.",dur:"45m",th:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=300&q=80"},{t:"Project Mayhem",d:"Things spiral out of control.",dur:"50m",th:"https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=300&q=80"}]},
+
+{id:"mx",title:"The Matrix",type:"movie",year:1999,maturity:"R",duration:"2h 16m",genres:["Sci-Fi","Action"],cast:["Keanu Reeves","Laurence Fishburne","Carrie-Anne Moss"],desc:"A computer hacker learns about the true nature of his reality and his role in the war against its controllers.",match:94,
+backdrop:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=500&q=80",
+progress:0,episodes:[{t:"The Red Pill",d:"Neo discovers the truth about The Matrix.",dur:"45m",th:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&q=80"},{t:"Training",d:"Neo learns kung fu and the rules of The Matrix.",dur:"30m",th:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&q=80"},{t:"The One",d:"Neo confronts Agent Smith in the final showdown.",dur:"50m",th:"https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=300&q=80"}]},
+
+{id:"tlou",title:"The Last of Us",type:"series",year:2023,maturity:"TV-MA",seasons:1,genres:["Action","Sci-Fi","Drama"],cast:["Pedro Pascal","Bella Ramsey","Gabriel Luna"],desc:"Twenty years after civilization has been destroyed, Joel is hired to smuggle Ellie, a 14-year-old girl, out of a quarantine zone.",match:97,
+backdrop:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&q=80",
+progress:.55,episodes:[{t:"When You're Lost in the Darkness",d:"Joel attempts to escape a quarantine zone with Ellie.",dur:"81m",th:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&q=80"},{t:"Infected",d:"Joel and Tess guide Ellie through Boston's ruins.",dur:"52m",th:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&q=80"},{t:"Long, Long Time",d:"A standalone love story in the apocalypse.",dur:"76m",th:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&q=80"}]},
+
+{id:"sq",title:"Squid Game",type:"series",year:2021,maturity:"TV-MA",seasons:2,genres:["Thriller","Drama","Action"],cast:["Lee Jung-jae","Park Hae-soo","Wi Ha-jun"],desc:"Hundreds of cash-strapped players accept an invitation to compete in children's games — with deadly high stakes.",match:94,
+backdrop:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=500&q=80",
+progress:0,episodes:[{t:"Red Light, Green Light",d:"Cash-strapped players enter a mysterious deadly tournament.",dur:"60m",th:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80"},{t:"Hell",d:"Players struggle with whether to continue the games.",dur:"63m",th:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80"},{t:"The Man with the Umbrella",d:"Players face a new deadly game.",dur:"58m",th:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80"}]},
+
+{id:"wed",title:"Wednesday",type:"series",year:2022,maturity:"TV-14",seasons:1,genres:["Comedy","Fantasy","Mystery"],cast:["Jenna Ortega","Gwendoline Christie","Christina Ricci"],desc:"Smart, sarcastic and a little dead inside, Wednesday Addams investigates a murder spree at Nevermore Academy.",match:92,
+backdrop:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&q=80",
+progress:0,episodes:[{t:"Wednesday's Child Is Full of Woe",d:"Wednesday is expelled and enrolls at Nevermore.",dur:"59m",th:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80"},{t:"Woe Is the Loneliest Number",d:"Wednesday runs into a rival at the Poe Cup.",dur:"48m",th:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80"},{t:"Friend or Woe",d:"Wednesday discovers a hidden society.",dur:"50m",th:"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80"}]},
+
+{id:"hotd",title:"House of the Dragon",type:"series",year:2024,maturity:"TV-MA",seasons:2,genres:["Fantasy","Drama","Action"],cast:["Matt Smith","Emma D'Arcy","Olivia Cooke"],desc:"The story of the Targaryen civil war — the Dance of the Dragons — set 200 years before Game of Thrones.",match:95,
+backdrop:"https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&q=80",
+progress:0,episodes:[{t:"The Heirs of the Dragon",d:"Viserys hosts a tournament.",dur:"66m",th:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80"},{t:"The Rogue Prince",d:"Daemon makes an alliance in the Stepstones.",dur:"54m",th:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80"},{t:"Second of His Name",d:"Daemon wages war in the Stepstones.",dur:"58m",th:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80"}]},
+
+{id:"par",title:"Parasite",type:"movie",year:2019,maturity:"R",duration:"2h 12m",genres:["Drama","Thriller","Comedy"],cast:["Kang-ho Song","Sun-kyun Lee","Yeo-jeong Jo"],desc:"Greed and class discrimination threaten the newly formed symbiotic relationship between the wealthy Parks and the destitute Kims.",match:93,
+backdrop:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=500&q=80",
+progress:0,episodes:[{t:"The Infiltration",d:"Ki-woo gets a tutoring job with the Parks.",dur:"40m",th:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&q=80"},{t:"The Flood",d:"A storm reveals buried truths.",dur:"35m",th:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&q=80"},{t:"The Party",d:"Everything converges at the birthday party.",dur:"40m",th:"https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=300&q=80"}]},
+
+{id:"fg",title:"Forrest Gump",type:"movie",year:1994,maturity:"PG-13",duration:"2h 22m",genres:["Drama","Comedy","Romance"],cast:["Tom Hanks","Robin Wright","Gary Sinise"],desc:"The presidencies of Kennedy and Johnson, Vietnam, Watergate — all from the perspective of an Alabama man with an IQ of 75.",match:97,
+backdrop:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=500&q=80",
+progress:0,episodes:[{t:"Young Forrest",d:"Forrest meets his childhood love Jenny.",dur:"40m",th:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=300&q=80"},{t:"Vietnam",d:"Forrest serves in the Vietnam War.",dur:"45m",th:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=300&q=80"},{t:"Run Forrest Run",d:"Forrest runs across America.",dur:"30m",th:"https://images.unsplash.com/photo-1475924156734-496f6cac6ec1?w=300&q=80"}]},
+
+{id:"lotr",title:"The Lord of the Rings",type:"movie",year:2003,maturity:"PG-13",duration:"3h 21m",genres:["Fantasy","Adventure","Drama"],cast:["Elijah Wood","Viggo Mortensen","Ian McKellen"],desc:"Gandalf and Aragorn lead the World of Men against Sauron's army as Frodo and Sam approach Mount Doom.",match:98,
+backdrop:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=500&q=80",
+progress:0,episodes:[{t:"The Fellowship",d:"Nine companions set out to destroy the One Ring.",dur:"60m",th:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=80"},{t:"The Two Towers",d:"The fellowship splits into three groups.",dur:"55m",th:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=80"},{t:"Return of the King",d:"The final battle for Middle-earth.",dur:"65m",th:"https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=300&q=80"}]},
+
+{id:"sh",title:"Sherlock",type:"series",year:2017,maturity:"TV-14",seasons:4,genres:["Drama","Crime","Mystery"],cast:["Benedict Cumberbatch","Martin Freeman","Mark Gatiss"],desc:"A modern update of Sherlock Holmes and Dr. Watson solving crime in 21st century London.",match:95,
+backdrop:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=500&q=80",
+progress:0,episodes:[{t:"A Study in Pink",d:"Holmes and Watson investigate a string of suicides.",dur:"88m",th:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=300&q=80"},{t:"The Blind Banker",d:"An ancient Chinese smuggling ring is uncovered.",dur:"89m",th:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=300&q=80"},{t:"The Great Game",d:"Moriarty challenges Sherlock with bombs.",dur:"90m",th:"https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=300&q=80"}]},
+
+{id:"rm",title:"Rick and Morty",type:"series",year:2023,maturity:"TV-MA",seasons:7,genres:["Comedy","Sci-Fi","Animation"],cast:["Justin Roiland","Chris Parnell","Spencer Grammer"],desc:"An alcoholic scientist drags his grandson on dangerous inter-dimensional adventures.",match:94,
+backdrop:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=500&q=80",
+progress:.2,episodes:[{t:"Pilot",d:"Rick moves in and takes Morty on adventures.",dur:"22m",th:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=300&q=80"},{t:"Lawnmower Dog",d:"Rick makes the dog intelligent.",dur:"22m",th:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=300&q=80"},{t:"Anatomy Park",d:"Inside a body, a theme park goes wrong.",dur:"22m",th:"https://images.unsplash.com/photo-1534996858221-380b92700493?w=300&q=80"}]},
+
+{id:"dkr",title:"The Dark Knight Rises",type:"movie",year:2012,maturity:"PG-13",duration:"2h 44m",genres:["Action","Drama","Thriller"],cast:["Christian Bale","Tom Hardy","Anne Hathaway"],desc:"Eight years after the Joker's reign of anarchy, Batman must return to defend Gotham against the brutal extremist Bane.",match:91,
+backdrop:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=500&q=80",
+progress:0,episodes:[{t:"The Rise of Bane",d:"Bane takes over Gotham's underground.",dur:"45m",th:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=300&q=80"},{t:"The Pit",d:"Bruce Wayne escapes an inescapable prison.",dur:"40m",th:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=300&q=80"},{t:"The Dark Knight Rises",d:"Batman makes his final stand for Gotham.",dur:"55m",th:"https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=300&q=80"}]},
+
+{id:"opp",title:"Oppenheimer",type:"movie",year:2023,maturity:"R",duration:"3h",genres:["Drama","History","Thriller"],cast:["Cillian Murphy","Emily Blunt","Robert Downey Jr."],desc:"The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb.",match:96,
+backdrop:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1400&q=80",
+poster:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&q=80",
+thumb:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=500&q=80",
+progress:0,episodes:[{t:"Prometheus",d:"A young Oppenheimer discovers physics.",dur:"50m",th:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80"},{t:"Fission",d:"The Manhattan Project begins.",dur:"55m",th:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80"},{t:"Trinity",d:"The first nuclear test is conducted.",dur:"45m",th:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80"}]}
+];
+
+// ═══════ ROW CONFIG ═══════
+const ROWS_CFG=[
+  {key:"trending",label:"Trending Now",ids:["st","bb","hotd","sq","tlou","dk","inc","int","end","mx"],trending:true},
+  {key:"continue",label:"Continue Watching for User",ids:["bb","int","wit","end","tlou","rm"],showProgress:true},
+  {key:"new",label:"New on Netflix",ids:["opp","tlou","wed","hotd","sq","rm","wit","che"]},
+  {key:"action",label:"Action Thrillers",ids:["dk","end","dkr","inc","mx","wit","hotd","tlou","sq"]},
+  {key:"because",label:"Because You Watched Stranger Things",ids:["wed","che","sq","tlou","wit","sh","rm","lotr"]},
+  {key:"mylist",label:"My List",ids:[]}
+];
+
+// ═══════ STATE ═══════
+let myList=JSON.parse(localStorage.getItem('nf_mylist')||'[]');
+let progressData=JSON.parse(localStorage.getItem('nf_progress')||'{}');
+let currentProfile=null;
+let heroSlideIdx=0;let heroTimer=null;
+const HERO_ITEMS=["st","dk","int","hotd","opp"];
+
+const PROFILES=[
+  {name:"User 1",img:"https://api.dicebear.com/7.x/avataaars/svg?seed=netflix1&backgroundColor=b6e3f4"},
+  {name:"User 2",img:"https://api.dicebear.com/7.x/avataaars/svg?seed=netflix2&backgroundColor=ffd5dc"},
+  {name:"Children",img:"https://api.dicebear.com/7.x/avataaars/svg?seed=netflixkids&backgroundColor=c0aede"},
+  {name:"Guest",img:"https://api.dicebear.com/7.x/avataaars/svg?seed=guest42&backgroundColor=d1d4f9"},
+];
+const NOTIFICATIONS=[
+  {img:"https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=300&q=80",title:"New Season Available",text:"Stranger Things Season 5 coming soon",time:"2 days ago"},
+  {img:"https://images.unsplash.com/photo-1542751371-adc38448a05e?w=300&q=80",title:"Trending Now",text:"The Last of Us is #1 in your country",time:"3 days ago"},
+  {img:"https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=300&q=80",title:"New Arrival",text:"Squid Game: Season 2 is now streaming",time:"1 week ago"},
+  {img:"https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=300&q=80",title:"Award Winner",text:"Oppenheimer sweeps the Oscars",time:"2 weeks ago"},
+  {img:"https://images.unsplash.com/photo-1534447677768-be436bb09401?w=300&q=80",title:"Watch Now",text:"House of the Dragon S2 has arrived",time:"3 weeks ago"},
+];
+
+DATA.forEach(d=>{if(d.progress&&!progressData[d.id])progressData[d.id]=d.progress});
+
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const find=id=>DATA.find(d=>d.id===id);
+function fbImg(el){el.onerror=null;el.style.background='linear-gradient(135deg,#1a1a1a,#2a2a2a)';el.style.opacity='.5'}
+
+// ═══════ PARTICLES ═══════
+(function initParticles(){
+  const c=document.getElementById('particles-canvas');
+  const ctx=c.getContext('2d');
+  let w,h;const particles=[];
+  function resize(){w=c.width=window.innerWidth;h=c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  for(let i=0;i<40;i++){
+    particles.push({
+      x:Math.random()*w,y:Math.random()*h,
+      r:Math.random()*2+.5,vx:(Math.random()-.5)*.3,vy:-(Math.random()*.4+.1),
+      o:Math.random()*.4+.1
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.y<-10){p.y=h+10;p.x=Math.random()*w}
+      if(p.x<0)p.x=w;if(p.x>w)p.x=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(229,9,20,${p.o})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ═══════ PROFILES ═══════
+function buildProfiles(){
+  $('#pfGrid').innerHTML=PROFILES.map((p,i)=>`
+    <div class="pf-card" onclick="selectProfile(${i})">
+      <div class="pf-avatar"><img src="${p.img}" alt="${p.name}" onerror="fbImg(this)"></div>
+      <div class="pf-name">${p.name}</div>
+    </div>`).join('')+`
+    <div class="pf-card">
+      <div class="pf-add"><i class="fas fa-plus"></i></div>
+      <div class="pf-name">Add Profile</div>
+    </div>`;
+}
+function selectProfile(i){
+  currentProfile=PROFILES[i];
+  sessionStorage.setItem('nf_profile',JSON.stringify(currentProfile));
+  $('#profilesGate').classList.add('hidden');
+  setTimeout(()=>{
+    $('#mainApp').style.display='block';
+    $('#navAvatar').innerHTML=`<img src="${currentProfile.img}" onerror="fbImg(this)">`;
+    buildHome();
+  },500);
+}
+function switchProfiles(){
+  clearInterval(heroTimer);
+  $('#mainApp').style.display='none';
+  $('#profilesGate').classList.remove('hidden');
+}
+
+// ═══════ HERO SLIDESHOW ═══════
+function buildHero(){
+  const bgEl=$('#heroBg');
+  bgEl.innerHTML=HERO_ITEMS.map((id,i)=>{
+    const item=find(id);
+    return `<img class="hero-slide ${i===0?'active':''}" src="${item.backdrop}" alt="${item.title}" loading="lazy" onerror="fbImg(this)">`;
+  }).join('');
+
+  $('#heroDots').innerHTML=HERO_ITEMS.map((_,i)=>
+    `<div class="hero-dot ${i===0?'active':''}" onclick="goHeroSlide(${i})"></div>`
+  ).join('');
+
+  updateHeroContent(0);
+  heroTimer=setInterval(()=>{
+    heroSlideIdx=(heroSlideIdx+1)%HERO_ITEMS.length;
+    goHeroSlide(heroSlideIdx);
+  },8000);
+}
+function goHeroSlide(idx){
+  heroSlideIdx=idx;
+  $$('.hero-slide').forEach((s,i)=>s.classList.toggle('active',i===idx));
+  $$('.hero-dot').forEach((d,i)=>{d.classList.toggle('active',i===idx)});
+  updateHeroContent(idx);
+}
+function updateHeroContent(idx){
+  const item=find(HERO_ITEMS[idx]);
+  $('#heroContent').innerHTML=`
+    <div class="hero-badge float-in"><span class="top10">TOP 10</span> #${idx+1} in TV Shows Today</div>
+    <h1 class="hero-title float-in float-in-d1">${item.title}</h1>
+    <div class="hero-meta float-in float-in-d2">
+      <span class="match-pct">${item.match}% Match</span>
+      <span>${item.year}</span>
+      <span class="maturity">${item.maturity}</span>
+      <span>${item.seasons?item.seasons+' Seasons':item.duration}</span>
+      <span class="quality">HD</span>
+    </div>
+    <p class="hero-desc float-in float-in-d3">${item.desc.substring(0,220)}</p>
+    <div class="hero-buttons float-in float-in-d4">
+      <button class="btn-play" onclick="openModal('${item.id}')"><i class="fas fa-play"></i> Play</button>
+      <button class="btn-info" onclick="openModal('${item.id}')"><i class="fas fa-circle-info"></i> More Info</button>
+    </div>`;
+  $('#heroMaturity').innerHTML=`<span class="m-bar">${item.maturity}</span>`;
+}
+
+// ═══════ PARALLAX ═══════
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  const bg=$('#heroBg');
+  if(bg)bg.style.transform=`translateY(${y*.35}px)`;
+  $('#navbar').classList.toggle('scrolled',y>20);
+});
+
+// ═══════ ROW INTERSECTION (SLIDE IN) ═══════
+const rowObserver=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')});
+},{threshold:.15});
+
+// ═══════ CONTENT ROWS ═══════
+function buildRows(){
+  const area=$('#contentArea');area.innerHTML='';
+  ROWS_CFG.forEach(row=>{
+    let ids=row.key==='mylist'?myList:row.ids;
+    if(!ids.length&&row.key==='mylist'){
+      area.innerHTML+=`<section class="row-section visible" id="row-${row.key}">
+        <div class="row-header"><span class="row-title">${row.label}</span></div>
+        <div style="padding:20px 56px;color:#555;font-size:14px">Add titles to your list by clicking the + icon on any card.</div>
+      </section>`;return;
+    }
+    let cards='';
+    ids.forEach((id,i)=>{
+      const item=find(id);if(!item)return;
+      const inList=myList.includes(id);
+      const prog=progressData[id]||0;
+      if(row.trending){
+        cards+=`<div class="card trending-card" onmouseenter="hoverTitle('${item.title}')">
+          <span class="rank-num">${i+1}</span>
+          <div>
+            <div class="card-img"><img src="${item.thumb}" alt="${item.title}" loading="lazy" onerror="fbImg(this)"></div>
+            <div class="card-detail">
+              <div class="cd-icons">
+                <button class="cd-icon play-i" onclick="event.stopPropagation();openModal('${id}')"><i class="fas fa-play"></i></button>
+                <button class="cd-icon outline ${inList?'in-list':''}" onclick="event.stopPropagation();toggleList('${id}')"><i class="fas fa-${inList?'check':'plus'}"></i></button>
+                <button class="cd-icon outline"><i class="fas fa-thumbs-up"></i></button>
+                <button class="cd-icon outline expand" onclick="event.stopPropagation();openModal('${id}')"><i class="fas fa-chevron-down"></i></button>
+              </div>
+              <div class="cd-title">${item.title}</div>
+              <div class="cd-meta"><span class="match">${item.match}%</span><span>${item.year}</span><span class="mat">${item.maturity}</span></div>
+              <div class="cd-genres">${item.genres.slice(0,3).map(g=>`<span>${g}</span>`).join('')}</div>
+            </div>
+          </div>
+        </div>`;
+      }else{
+        cards+=`<div class="card" onmouseenter="hoverTitle('${item.title}')">
+          <div class="card-img">
+            <img src="${item.thumb}" alt="${item.title}" loading="lazy" onerror="fbImg(this)">
+            ${row.showProgress&&prog?`<div class="card-progress"><div class="card-progress-bar" style="width:${prog*100}%"></div></div>`:''}
+          </div>
+          <div class="card-detail">
+            <div class="cd-icons">
+              <button class="cd-icon play-i" onclick="event.stopPropagation();openModal('${id}')"><i class="fas fa-play"></i></button>
+              <button class="cd-icon outline ${inList?'in-list':''}" onclick="event.stopPropagation();toggleList('${id}')"><i class="fas fa-${inList?'check':'plus'}"></i></button>
+              <button class="cd-icon outline"><i class="fas fa-thumbs-up"></i></button>
+              <button class="cd-icon outline"><i class="fas fa-thumbs-down"></i></button>
+              <button class="cd-icon outline expand" onclick="event.stopPropagation();openModal('${id}')"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="cd-title">${item.title}</div>
+            <div class="cd-meta"><span class="match">${item.match}%</span><span>${item.year}</span><span class="mat">${item.maturity}</span>${item.seasons?`<span>${item.seasons}S</span>`:''}</div>
+            <div class="cd-genres">${item.genres.slice(0,3).map(g=>`<span>${g}</span>`).join('')}</div>
+          </div>
+        </div>`;
+      }
+    });
+    area.innerHTML+=`<section class="row-section" id="row-${row.key}">
+      <div class="row-header">
+        <span class="row-title">${row.label}</span>
+        <span class="row-explore">Explore All <i class="fas fa-chevron-right" style="font-size:10px"></i></span>
+      </div>
+      <div class="row-wrapper">
+        <button class="scroll-btn left" onclick="scrollR(this,-1)"><i class="fas fa-chevron-left"></i></button>
+        <div class="row-slider">${cards}</div>
+        <button class="scroll-btn right" onclick="scrollR(this,1)"><i class="fas fa-chevron-right"></i></button>
+      </div>
+    </section>`;
+  });
+  // Observe rows for entrance animation
+  $$('.row-section').forEach(s=>rowObserver.observe(s));
+}
+function scrollR(btn,dir){btn.parentElement.querySelector('.row-slider').scrollBy({left:dir*850,behavior:'smooth'})}
+function hoverTitle(t){document.title=t+' - Netflix'}
+
+// Auto-scroll rows
+function initAutoScroll(){
+  const sliders=$$('.row-slider');
+  sliders.forEach((slider,i)=>{
+    let dir=1;
+    setInterval(()=>{
+      if(slider.matches(':hover'))return;
+      const max=slider.scrollWidth-slider.clientWidth;
+      if(slider.scrollLeft>=max-5)dir=-1;
+      if(slider.scrollLeft<=5)dir=1;
+      slider.scrollBy({left:dir*230,behavior:'smooth'});
+    },4000+i*600);
+  });
+}
+
+// ═══════ MY LIST ═══════
+function toggleList(id){
+  const i=myList.indexOf(id);
+  if(i>-1)myList.splice(i,1);else myList.push(id);
+  localStorage.setItem('nf_mylist',JSON.stringify(myList));
+  buildRows();
+}
+
+// ═══════ MODAL ═══════
+function openModal(id){
+  const item=find(id);if(!item)return;
+  const inList=myList.includes(id);
+  const related=DATA.filter(d=>d.id!==id&&d.genres.some(g=>item.genres.includes(g))).slice(0,6);
+  $('#modal').innerHTML=`
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+    <div class="modal-hero">
+      <img src="${item.backdrop}" alt="${item.title}" onerror="fbImg(this)">
+      <div class="modal-hero-grad"></div>
+      <div class="modal-hero-content">
+        <h2 class="modal-hero-title">${item.title}</h2>
+        <div class="modal-hero-actions">
+          <button class="btn-play"><i class="fas fa-play"></i> Play</button>
+          <button class="cd-icon outline ${inList?'in-list':''}" style="width:40px;height:40px;font-size:16px" onclick="toggleList('${id}');openModal('${id}')"><i class="fas fa-${inList?'check':'plus'}"></i></button>
+          <button class="cd-icon outline" style="width:40px;height:40px;font-size:16px"><i class="fas fa-thumbs-up"></i></button>
+          <button class="cd-icon outline" style="width:40px;height:40px;font-size:16px"><i class="fas fa-thumbs-down"></i></button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-left">
+        <div class="ml-meta">
+          <span class="match">${item.match}% Match</span><span>${item.year}</span>
+          <span>${item.seasons?item.seasons+' Seasons':item.duration}</span>
+          <span class="mat">${item.maturity}</span><span class="qual">HD</span>
+        </div>
+        <p class="ml-desc">${item.desc}</p>
+      </div>
+      <div class="modal-right">
+        <p><strong>Cast: </strong>${item.cast.join(', ')}</p>
+        <p><strong>Genres: </strong>${item.genres.join(', ')}</p>
+        <p><strong>This show is: </strong>${item.match>95?'Exciting, Suspenseful, Dark':'Engaging, Dramatic, Intense'}</p>
+      </div>
+    </div>
+    <div class="modal-tabs">
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="switchTab(this,'eps-${id}')">Episodes</button>
+        <button class="tab-btn" onclick="switchTab(this,'mlt-${id}')">More Like This</button>
+      </div>
+      <div class="tab-content" id="eps-${id}">
+        <select class="ep-season-sel"><option>Season 1</option></select>
+        ${item.episodes.map((ep,i)=>`
+          <div class="episode-item">
+            <div class="ep-num">${i+1}</div>
+            <div class="ep-thumb">
+              <img src="${ep.th}" alt="${ep.t}" loading="lazy" onerror="fbImg(this)">
+              <div class="ep-play-hover"><i class="fas fa-play"></i></div>
+            </div>
+            <div class="ep-info">
+              <div class="ep-info-top"><h4>${ep.t}</h4><span>${ep.dur}</span></div>
+              <p>${ep.d}</p>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="tab-content" id="mlt-${id}" style="display:none">
+        <div class="mlt-grid">
+          ${related.map(r=>`
+            <div class="mlt-card" onclick="openModal('${r.id}')">
+              <img src="${r.thumb}" alt="${r.title}" loading="lazy" onerror="fbImg(this)">
+              <div class="mlt-card-info">
+                <div class="mlt-meta"><span class="match">${r.match}%</span><span>${r.year}</span><span>${r.maturity}</span></div>
+                <p>${r.desc.substring(0,120)}…</p>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+  $('#modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){$('#modalOverlay').classList.remove('open');document.body.style.overflow=''}
+function switchTab(btn,showId){
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.modal-tabs').querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
+  document.getElementById(showId).style.display='block';
+}
+
+// ═══════ SEARCH ═══════
+function handleSearch(){
+  const q=$('#searchInput').value.trim().toLowerCase();
+  const ov=$('#searchOverlay');
+  if(!q){ov.classList.remove('open');return}
+  ov.classList.add('open');
+  const results=DATA.filter(d=>d.title.toLowerCase().includes(q)||d.genres.some(g=>g.toLowerCase().includes(q))||d.cast.some(c=>c.toLowerCase().includes(q)));
+  if(!results.length){
+    $('#searchResults').innerHTML=`<div class="search-empty"><i class="fas fa-film"></i><p>No results for "${q}"</p><p style="font-size:14px;margin-top:8px;color:#555">Try searching for another title, genre, or actor.</p></div>`;return;
+  }
+  $('#searchResults').innerHTML=`
+    <h2>Results for "${q}"</h2>
+    <div class="search-grid">
+      ${results.map(r=>`<div class="s-card" onclick="openModal('${r.id}')">
+        <img src="${r.thumb}" alt="${r.title}" loading="lazy" onerror="fbImg(this)">
+        <div class="s-title">${r.title}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+// ═══════ NOTIFICATIONS ═══════
+function buildNotifs(){
+  $('#notifList').innerHTML=NOTIFICATIONS.map(n=>`
+    <div class="notif-item">
+      <img src="${n.img}" alt="" loading="lazy" onerror="fbImg(this)">
+      <div class="ni-text"><strong>${n.title}</strong>${n.text}<div class="ni-time">${n.time}</div></div>
+    </div>`).join('');
+}
+
+// ═══════ HOME INIT ═══════
+function buildHome(){buildHero();buildRows();buildNotifs();document.title='Home - Netflix';setTimeout(initAutoScroll,2000)}
+
+// ═══════ EVENTS ═══════
+$('#searchToggle').addEventListener('click',()=>{
+  const box=$('#navSearch');box.classList.toggle('open');
+  if(box.classList.contains('open'))$('#searchInput').focus();
+  else{$('#searchInput').value='';$('#searchOverlay').classList.remove('open')}
+});
+$('#searchInput').addEventListener('input',handleSearch);
+$('#bellIcon').addEventListener('click',()=>$('#notifPanel').classList.toggle('open'));
+$('#modalOverlay').addEventListener('click',e=>{if(e.target===$('#modalOverlay'))closeModal()});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();$('#searchOverlay').classList.remove('open');$('#navSearch').classList.remove('open');$('#searchInput').value='';$('#notifPanel').classList.remove('open')}
+});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#bellIcon')&&!e.target.closest('#notifPanel'))$('#notifPanel').classList.remove('open');
+});
+
+// Init
+buildProfiles();
+const saved=sessionStorage.getItem('nf_profile');
+if(saved){
+  currentProfile=JSON.parse(saved);
+  $('#profilesGate').classList.add('hidden');
+  $('#mainApp').style.display='block';
+  $('#navAvatar').innerHTML=`<img src="${currentProfile.img}" onerror="fbImg(this)">`;
+  buildHome();
+}
+</script>
+</body>
+</html>
