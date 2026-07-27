@@ -1,0 +1,7 @@
+{
+  "name": "streamflix-root",
+  "private": true,
+  "scripts": {
+    "build": "cd streamflix-react && npm run build"
+  }
+}

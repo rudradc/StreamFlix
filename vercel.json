@@ -1,0 +1,10 @@
+{
+  "buildCommand": "cd streamflix-react && npm run build",
+  "outputDirectory": "streamflix-react/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
