@@ -1,7 +1,10 @@
 {
   "name": "streamflix-root",
   "private": true,
+  "workspaces": [
+    "streamflix-react"
+  ],
   "scripts": {
-    "build": "cd streamflix-react && npm run build"
+    "build": "npm run build --prefix streamflix-react"
   }
 }
