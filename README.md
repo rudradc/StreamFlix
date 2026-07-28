@@ -6,6 +6,11 @@
     <b>A premium, feature-rich streaming web application inspired by Netflix, built with React 19, Vite, Three.js 3D visuals, Tailwind CSS, GSAP animations, and AI content discovery.</b>
   </p>
 
+  <p align="center">
+    🚀 <b><a href="https://stream-flix-lilac.vercel.app/">View Live Demo</a></b>
+  </p>
+
+  [![Live Demo](https://img.shields.io/badge/Demo-Live_App-E50914?style=for-the-badge&logo=vercel&logoColor=white)](https://stream-flix-lilac.vercel.app/)
   [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
   [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
@@ -20,6 +25,7 @@
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
+- [Live Demo](#-live-demo)
 - [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)
 - [Getting Started](#-getting-started)
@@ -33,6 +39,13 @@
 ## 🌟 Overview
 
 **StreamFlix** goes beyond standard UI clones by combining modern web graphics, smooth animations, and intelligent user interaction into a seamlessly designed video streaming experience. Inspired by Netflix's signature interface, StreamFlix introduces **interactive 3D canvas visuals**, **smart AI-driven recommendations**, a **custom HTML5 media player**, and multi-profile watch state management.
+
+---
+
+## 🌐 Live Demo
+
+Experience the live application here:  
+👉 **[https://stream-flix-lilac.vercel.app/](https://stream-flix-lilac.vercel.app/)**
 
 ---
 
